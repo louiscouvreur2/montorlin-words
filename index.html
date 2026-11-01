@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Montorlin - Mots partagés</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest: #1a2e1a;
+      --forest-dark: #0d1a0d;
+      --forest-light: #2d4a2d;
+      --moss: #4a6b3a;
+      --moss-light: #5a7c4a;
+      --cream: #f5f0e1;
+      --cream-dark: #e8e0cc;
+      --gold: #d4a843;
+      --gold-light: #e8c06a;
+      --gold-dark: #b89038;
+      --white: #faf8f3;
+      --text: #1a2e1a;
+      --text-light: #3d5a3d;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --forest: #0f1a0f;
+        --forest-dark: #081008;
+        --forest-light: #1a2a1a;
+        --moss: #3a5a2a;
+        --moss-light: #4a6a3a;
+        --cream: #1a2e1a;
+        --cream-dark: #2d4a2d;
+        --gold: #c49833;
+        --gold-light: #d8b05a;
+        --gold-dark: #a88028;
+        --white: #e8e0d0;
+        --text: #e8e0d0;
+        --text-light: #c8d0c8;
+      }
+    }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--forest);
+      min-height: 100vh;
+      color: var(--white);
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(74, 107, 58, 0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(212, 168, 67, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .mountains {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40vh;
+      min-height: 200px;
+      max-height: 300px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .mountain {
+      position: absolute;
+      bottom: 0;
+      border-style: solid;
+      border-bottom: 0;
+    }
+    .mountain-1 { left: -10%; width: 0; height: 0; border-left: 60vw solid transparent; border-right: 60vw solid transparent; border-top: 35vh solid var(--forest-dark); opacity: 0.6; }
+    .mountain-2 { left: 15%; width: 0; height: 0; border-left: 45vw solid transparent; border-right: 45vw solid transparent; border-top: 28vh solid var(--forest); opacity: 0.8; }
+    .mountain-3 { right: -5%; width: 0; height: 0; border-left: 50vw solid transparent; border-right: 50vw solid transparent; border-top: 32vh solid var(--forest-dark); opacity: 0.5; }
+    .mountain-4 { right: 20%; width: 0; height: 0; border-left: 35vw solid transparent; border-right: 35vw solid transparent; border-top: 22vh solid var(--forest); opacity: 0.7; }
+    .moon {
+      position: fixed;
+      top: 8%;
+      right: 12%;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #f5f0e1 0%, #e8dcc0 40%, #d4c4a0 100%);
+      box-shadow: 
+        0 0 40px rgba(212, 168, 67, 0.4),
+        0 0 80px rgba(212, 168, 67, 0.2),
+        inset -5px -5px 20px rgba(0,0,0,0.1);
+      pointer-events: none;
+      z-index: 1;
+      animation: moonGlow 4s ease-in-out infinite alternate;
+    }
+    @keyframes moonGlow {
+      0% { box-shadow: 0 0 40px rgba(212, 168, 67, 0.4), 0 0 80px rgba(212, 168, 67, 0.2), inset -5px -5px 20px rgba(0,0,0,0.1); }
+      100% { box-shadow: 0 0 60px rgba(212, 168, 67, 0.6), 0 0 120px rgba(212, 168, 67, 0.3), inset -5px -5px 20px rgba(0,0,0,0.1); }
+    }
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background-image: 
+        radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+        radial-gradient(1px 1px at 30% 40%, #fff, transparent),
+        radial-gradient(1px 1px at 50% 15%, #fff, transparent),
+        radial-gradient(1px 1px at 70% 30%, #fff, transparent),
+        radial-gradient(1px 1px at 90% 25%, #fff, transparent),
+        radial-gradient(1px 1px at 20% 60%, #fff, transparent),
+        radial-gradient(1px 1px at 80% 50%, #fff, transparent),
+        radial-gradient(1px 1px at 40% 70%, #fff, transparent),
+        radial-gradient(1px 1px at 60% 80%, #fff, transparent),
+        radial-gradient(1px 1px at 15% 85%, #fff, transparent);
+      background-repeat: repeat;
+      background-size: 400px 400px;
+      opacity: 0.3;
+      animation: twinkle 3s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.2; }
+      100% { opacity: 0.5; }
+    }
+    .card {
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(145deg, rgba(26, 46, 26, 0.95), rgba(13, 26, 13, 0.98));
+      border: 1px solid rgba(74, 107, 58, 0.3);
+      border-radius: 24px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      margin: 1rem auto;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(74, 107, 58, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .logo-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 1rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 8px 32px rgba(212, 168, 67, 0.4),
+        0 0 0 2px rgba(212, 168, 67, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    }
+    .logo-icon svg { width: 36px; height: 36px; color: var(--forest-dark); }
+    h1 { font-size: 2.2rem; font-weight: 400; letter-spacing: 0.05em; color: var(--cream); margin-bottom: 0.25rem; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .subtitle { color: var(--moss-light); font-size: 1rem; margin-bottom: 2rem; opacity: 0.8; }
+    .form-group { margin-bottom: 1.5rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--moss-light); margin-bottom: 0.5rem; opacity: 0.8; }
+    input, textarea {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: rgba(13, 26, 13, 0.8);
+      border: 2px solid rgba(74, 107, 58, 0.3);
+      border-radius: 12px;
+      color: var(--cream);
+      font-family: inherit;
+      font-size: 1.05rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    input::placeholder, textarea::placeholder { color: rgba(200, 220, 200, 0.4); }
+    input:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(212, 168, 67, 0.15), 0 0 20px rgba(212, 168, 67, 0.1);
+      background: rgba(13, 26, 13, 0.95);
+    }
+    input:not(:placeholder-shown) { border-color: var(--moss-light); }
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+      background-size: 200% 100%;
+      transition: background-position 0.4s ease;
+    }
+    .btn span { position: relative; z-index: 1; color: var(--forest-dark); }
+    .btn:hover::before { background-position: 200% 0; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn:disabled::before { background-position: 0 0; }
+    .error-message {
+      display: none;
+      text-align: center;
+      padding: 0.875rem;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 10px;
+      color: #fca5a5;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .error-message.show { display: block; }
+    .words-list { margin-top: 2rem; }
+    .word-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(13, 26, 13, 0.6);
+      border: 1px solid rgba(74, 107, 58, 0.3);
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .word-content { flex: 1; }
+    .word-text { font-size: 1.1rem; color: var(--cream); margin-bottom: 0.25rem; }
+    .word-meta { font-size: 0.8rem; color: var(--moss-light); }
+    .word-actions { display: flex; gap: 0.5rem; }
+    .btn-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      background: var(--forest-light);
+      color: var(--cream);
+    }
+    .btn-small::before { background: linear-gradient(90deg, var(--moss) 0%, var(--moss-light) 100%); }
+    .btn-danger-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      background: var(--forest-light);
+      color: #e87a6a;
+    }
+    .btn-danger-small::before { background: linear-gradient(90deg, #c85a4a 0%, #e87a6a 100%); }
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--moss-light);
+      opacity: 0.6;
+    }
+    .sync-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(74, 107, 58, 0.15);
+      border: 1px solid rgba(74, 107, 58, 0.3);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--moss-light);
+      margin-bottom: 1rem;
+    }
+    .sync-indicator .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .footer-note {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: var(--moss);
+      opacity: 0.6;
+    }
+    @media (max-width: 768px) {
+      .card { padding: 1.5rem; margin: 0.5rem; border-radius: 16px; }
+      h1 { font-size: 1.8rem; }
+      .logo-icon { width: 64px; height: 64px; }
+      .logo-icon svg { width: 32px; height: 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="mountains" aria-hidden="true">
+    <div class="mountain mountain-1"></div>
+    <div class="mountain mountain-2"></div>
+    <div class="mountain mountain-3"></div>
+    <div class="mountain mountain-4"></div>
+  </div>
+  <div class="moon" aria-hidden="true"></div>
+
+  <main class="card">
+    <header class="logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </div>
+      <h1>Montorlin</h1>
+      <p class="subtitle">Mots partagés en famille</p>
+    </header>
+
+    <div class="sync-indicator" id="syncIndicator">
+      <span class="dot"></span>
+      <span id="syncText">Synchronisation...</span>
+    </div>
+
+    <div class="error-message" id="errorMsg" role="alert"></div>
+
+    <form id="wordForm">
+      <div class="form-group">
+        <label for="wordInput">Ajouter un mot</label>
+        <input type="text" id="wordInput" placeholder="Ton mot..." required maxlength="200" autocomplete="off">
+      </div>
+      <button type="submit" class="btn"><span>Ajouter</span></button>
+    </form>
+
+    <div class="words-list" id="wordsList">
+      <div class="empty-state" id="emptyState">Aucun mot pour l'instant. Ajoute le premier !</div>
+    </div>
+
+    <p class="footer-note">Synchronisé via Firebase · Multi-appareils</p>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, push, onValue, remove, set, query, orderByChild, limitToLast } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzQTifoKJrIpipX3H0t-y9uFWcnAQrDZw",
+      authDomain: "site-montorlin.firebaseapp.com",
+      databaseURL: "https://site-montorlin-default-rtdb.firebaseio.com",
+      projectId: "site-montorlin",
+      storageBucket: "site-montorlin.firebasestorage.app",
+      messagingSenderId: "109488883918",
+      appId: "1:109488883918:web:d8c4b9fcc379aea9e7e89f"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const wordsRef = ref(db, 'words');
+
+    // State
+    let words = [];
+
+    // DOM elements
+    const wordForm = document.getElementById('wordForm');
+    const wordInput = document.getElementById('wordInput');
+    const wordsList = document.getElementById('wordsList');
+    const emptyState = document.getElementById('emptyState');
+    const errorMsg = document.getElementById('errorMsg');
+    const syncText = document.getElementById('syncText');
+
+    // Sync status
+    function setSyncStatus(text) {
+      if (syncText) syncText.textContent = text;
+    }
+
+    // Format date
+    function formatDate(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Render words
+    function renderWords() {
+      if (words.length === 0) {
+        wordsList.innerHTML = '<div class="empty-state">Aucun mot pour l'instant. Ajoute le premier !</div>';
+        return;
+      }
+
+      wordsList.innerHTML = words.map(w => `
+        <div class="word-item" data-id="${w.id}">
+          <div class="word-content">
+            <div class="word-text">${w.text}</div>
+            <div class="word-meta">Ajouté par ${w.author} · ${formatDate(w.timestamp)}</div>
+          </div>
+          <div class="word-actions">
+            <button class="btn btn-small" onclick="editWord('${w.id}', '${w.text.replace(/'/g, "\'")}')"><span>Modifier</span></button>
+            <button class="btn btn-danger-small" onclick="deleteWord('${w.id}')"><span>Supprimer</span></button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Show error
+    function showError(message) {
+      if (errorMsg) {
+        errorMsg.textContent = message;
+        errorMsg.classList.add('show');
+      }
+      setTimeout(() => {
+        if (errorMsg) errorMsg.classList.remove('show');
+      }, 3000);
+    }
+
+    // Add word
+    wordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = wordInput.value.trim();
+      if (!text) return;
+
+      try {
+        setSyncStatus('Envoi...');
+        await push(wordsRef, {
+          text,
+          author: localStorage.getItem('montorlin-user') || 'Inconnu',
+          timestamp: Date.now()
+        });
+        wordInput.value = '';
+        setSyncStatus('Synchronisé');
+      } catch (error) {
+        console.error('Add word error:', error);
+        showError('Erreur: ' + error.message);
+        setSyncStatus('Erreur');
+      }
+    });
+
+    // Delete word
+    window.deleteWord = async (id) => {
+      if (!confirm('Supprimer ce mot ?')) return;
+      try {
+        setSyncStatus('Suppression...');
+        await remove(ref(db, 'words/' + id));
+        setSyncStatus('Synchronisé');
+      } catch (error) {
+        console.error('Delete error:', error);
+        showError('Erreur: ' + error.message);
+        setSyncStatus('Erreur');
+      }
+    };
+
+    // Edit word
+    window.editWord = (id, currentText) => {
+      const newText = prompt('Modifier le mot:', currentText);
+      if (newText && newText.trim() && newText.trim() !== currentText) {
+        setSyncStatus('Modification...');
+        set(ref(db, 'words/' + id), {
+          text: newText.trim(),
+          author: localStorage.getItem('montorlin-user') || 'Inconnu',
+          timestamp: Date.now()
+        }).then(() => setSyncStatus('Synchronisé'))
+          .catch(e => { showError('Erreur: ' + e.message); setSyncStatus('Erreur'); });
+      }
+    };
+
+    // Listen for real-time updates
+    const wordsQuery = query(wordsRef, orderByChild('timestamp'), limitToLast(50));
+    onValue(wordsQuery, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        words = Object.entries(data).map(([id, val]) => ({ id, ...val }))
+          .sort((a, b) => b.timestamp - a.timestamp);
+      } else {
+        words = [];
+      }
+      renderWords();
+      setSyncStatus('Synchronisé');
+    }, (error) => {
+      console.error('Firebase error:', error);
+      setSyncStatus('Erreur de connexion');
+    });
+
+    // Check existing user
+    const savedUser = localStorage.getItem('montorlin-user');
+    if (!savedUser) {
+      const name = prompt('Ton prénom:');
+      if (name) {
+        localStorage.setItem('montorlin-user', name.trim());
+      } else {
+        localStorage.setItem('montorlin-user', 'Inconnu');
+      }
+    }
+  </script>
+</body>
+</html>
