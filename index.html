@@ -380,16 +380,26 @@
       if (syncText) syncText.textContent = text;
     }
 
-    // Format date
+    // Format date - handles both timestamp and createdAt
     function formatDate(timestamp) {
       const date = new Date(timestamp);
       return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
+    // Normalize word data - handles both old (createdAt/text) and new (timestamp/author/text) formats
+    function normalizeWord(id, val) {
+      return {
+        id,
+        text: val.text || val.word || '',
+        author: val.author || val.user || 'Inconnu',
+        timestamp: val.timestamp || val.createdAt || val.time || Date.now()
+      };
+    }
+
     // Render words
     function renderWords() {
       if (words.length === 0) {
-        wordsList.innerHTML = '<div class="empty-state">Aucun mot pour l'instant. Ajoute le premier !</div>';
+        wordsList.innerHTML = '<div class="empty-state">Aucun mot pour l\'instant. Ajoute le premier !</div>';
         return;
       }
 
@@ -400,7 +410,7 @@
             <div class="word-meta">Ajouté par ${w.author} · ${formatDate(w.timestamp)}</div>
           </div>
           <div class="word-actions">
-            <button class="btn btn-small" onclick="editWord('${w.id}', '${w.text.replace(/'/g, "\'")}')"><span>Modifier</span></button>
+            <button class="btn btn-small" onclick="editWord('${w.id}', '${w.text.replace(/'/g, "\\'")}')"><span>Modifier</span></button>
             <button class="btn btn-danger-small" onclick="deleteWord('${w.id}')"><span>Supprimer</span></button>
           </div>
         </div>
@@ -473,7 +483,7 @@
     onValue(wordsQuery, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        words = Object.entries(data).map(([id, val]) => ({ id, ...val }))
+        words = Object.entries(data).map(([id, val]) => normalizeWord(id, val))
           .sort((a, b) => b.timestamp - a.timestamp);
       } else {
         words = [];
